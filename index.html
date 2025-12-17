@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roguelite Platformer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        #game-container {
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container"></div>
+
+    <!-- Load Phaser from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+
+    <!-- Load game files -->
+    <script src="src/config/GameConfig.js"></script>
+    <script src="src/systems/UpgradeManager.js"></script>
+    <script src="src/systems/WeaponManager.js"></script>
+    <script src="src/systems/EnemyManager.js"></script>
+    <script src="src/systems/ParrySystem.js"></script>
+    <script src="src/weapons/Sword.js"></script>
+    <script src="src/entities/BaseEnemy.js"></script>
+    <script src="src/entities/enemies/Archer.js"></script>
+    <script src="src/entities/enemies/Turtle.js"></script>
+    <script src="src/entities/enemies/SpeedZombie.js"></script>
+    <script src="src/entities/enemies/GiantRabbit.js"></script>
+    <script src="src/entities/Player.js"></script>
+    <script src="src/ui/HUD.js"></script>
+    <script src="src/scenes/BootScene.js"></script>
+    <script src="src/scenes/HubScene.js"></script>
+    <script src="src/scenes/GameScene.js"></script>
+    <script src="src/main.js"></script>
+</body>
+
+</html>

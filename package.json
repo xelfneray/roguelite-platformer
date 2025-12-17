@@ -1,0 +1,16 @@
+{
+  "name": "roguelite-platformer",
+  "version": "1.0.0",
+  "description": "A skill-based roguelite platformer with weapon evolution and randomized encounters",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "npx -y http-server . -p 8080 -o",
+    "start": "npx -y http-server . -p 8080 -o"
+  },
+  "keywords": ["game", "roguelite", "platformer", "phaser"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "phaser": "^3.70.0"
+  }
+}
