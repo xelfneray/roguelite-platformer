@@ -57,11 +57,11 @@ class BootScene extends Phaser.Scene {
             repeat: 0
         });
 
-        // Create player run animation
+        // Create player run animation (12 frames)
         this.anims.create({
             key: 'player-run-anim',
-            frames: this.anims.generateFrameNumbers('player-run', { start: 0, end: 5 }),
-            frameRate: 12,
+            frames: this.anims.generateFrameNumbers('player-run', { start: 0, end: 11 }),
+            frameRate: 16,
             repeat: -1 // Loop forever
         });
 
