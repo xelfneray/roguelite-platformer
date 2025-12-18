@@ -73,19 +73,19 @@ class BootScene extends Phaser.Scene {
             repeat: -1 // Loop forever
         });
 
-        // Create run-attack animation (8 frames)
+        // Create run-attack animation (7 frames)
         this.anims.create({
             key: 'run-attack-anim',
-            frames: this.anims.generateFrameNumbers('run-to-attack', { start: 0, end: 7 }),
-            frameRate: 16,
+            frames: this.anims.generateFrameNumbers('run-to-attack', { start: 0, end: 6 }),
+            frameRate: 14,
             repeat: 0 // Play once
         });
 
-        // Create standing attack animation
+        // Create standing attack animation (7 frames)
         this.anims.create({
             key: 'stand-attack-anim',
-            frames: this.anims.generateFrameNumbers('attacking', { start: 0, end: 7 }),
-            frameRate: 16,
+            frames: this.anims.generateFrameNumbers('attacking', { start: 0, end: 6 }),
+            frameRate: 14,
             repeat: 0 // Play once
         });
 
