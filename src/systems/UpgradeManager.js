@@ -71,6 +71,12 @@ class UpgradeManager {
     purchaseUpgrade(type) {
         const cost = GameConfig.upgrades.costs[type]; // Flat cost
 
+        // Check weapon level cap (max level is 4)
+        if (type === 'weaponLevel' && this.currentUpgrades.weaponLevel >= 4) {
+            console.log('Weapon already at max level (4)');
+            return false;
+        }
+
         if (cost && this.coins >= cost) {
             this.coins -= cost;
             this.currentUpgrades[type]++;

@@ -48,6 +48,8 @@ class Sword {
                 }
                 break;
             case 4:
+                // Level 4: basicSlash for immediate damage + magicSlash for extra range
+                this.basicSlash(direction);
                 this.magicSlash(direction);
                 break;
         }

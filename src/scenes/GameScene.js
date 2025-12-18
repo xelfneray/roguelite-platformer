@@ -133,44 +133,52 @@ class GameScene extends Phaser.Scene {
     }
 
     createFinishLine() {
-        // Create carpet finish line instead of green rectangle
-        const carpetX = this.levelLength - 150;
-        const carpetY = 540;
+        // Create flag finish line
+        const flagX = this.levelLength - 100;
+        const groundY = 560;
 
-        // Main carpet body (red/burgundy)
-        const carpet = this.add.rectangle(carpetX, carpetY, 100, 80, 0x8B0000);
-        this.physics.add.existing(carpet, true);
+        // Flag pole (tall brown rectangle)
+        const pole = this.add.rectangle(flagX, groundY - 100, 8, 200, 0x8B4513);
 
-        // Carpet pattern (golden stripes)
-        for (let i = 0; i < 3; i++) {
-            this.add.rectangle(
-                carpetX - 30 + (i * 30),
-                carpetY,
-                5,
-                80,
-                0xFFD700
-            );
+        // Flag (checkered pattern - racing flag style)
+        const flagWidth = 80;
+        const flagHeight = 50;
+        const flagY = groundY - 180;
+
+        // Flag background (white)
+        const flagBg = this.add.rectangle(flagX + flagWidth / 2 + 4, flagY, flagWidth, flagHeight, 0xffffff);
+
+        // Checkered pattern
+        const squareSize = 10;
+        for (let row = 0; row < 5; row++) {
+            for (let col = 0; col < 8; col++) {
+                if ((row + col) % 2 === 0) {
+                    this.add.rectangle(
+                        flagX + 4 + (col * squareSize) + squareSize / 2,
+                        flagY - flagHeight / 2 + (row * squareSize) + squareSize / 2,
+                        squareSize,
+                        squareSize,
+                        0x000000
+                    );
+                }
+            }
         }
 
-        // Carpet fringe (bottom)
-        for (let i = 0; i < 10; i++) {
-            this.add.rectangle(
-                carpetX - 45 + (i * 10),
-                carpetY + 40,
-                3,
-                8,
-                0x654321
-            );
-        }
+        // Pole top (golden ball)
+        this.add.circle(flagX, groundY - 200, 8, 0xFFD700);
 
-        // Victory text above carpet
-        this.add.text(carpetX, carpetY - 60, 'FINISH', {
-            fontSize: '20px',
+        // Invisible trigger zone for level completion
+        const triggerZone = this.add.rectangle(flagX, groundY - 50, 60, 100, 0x000000, 0);
+        this.physics.add.existing(triggerZone, true);
+
+        // Victory text
+        this.add.text(flagX, groundY - 220, 'FINISH', {
+            fontSize: '18px',
             fill: '#FFD700',
             fontStyle: 'bold'
         }).setOrigin(0.5);
 
-        this.levelEnd = carpet;
+        this.levelEnd = triggerZone;
     }
 
     createUpgradeMenu() {
