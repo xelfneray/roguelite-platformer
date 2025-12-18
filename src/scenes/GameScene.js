@@ -44,9 +44,16 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
         this.cameras.main.setBounds(0, 0, this.levelLength, 600);
 
-        // Zoom out on mobile for better view
+        // Zoom out on mobile for better view (only affects game world)
         if (this.touchControls && this.touchControls.isEnabled) {
-            this.cameras.main.setZoom(0.7);
+            this.cameras.main.setZoom(0.65);
+
+            // Create UI camera that ignores zoom
+            this.uiCamera = this.cameras.add(0, 0, this.cameras.main.width, this.cameras.main.height);
+            this.uiCamera.setScroll(0, 0);
+
+            // Main camera ignores UI elements
+            this.cameras.main.ignore([]);
         }
 
         // Listen to events

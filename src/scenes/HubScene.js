@@ -52,6 +52,50 @@ class HubScene extends Phaser.Scene {
             fontSize: '14px',
             fill: '#00ff88'
         }).setOrigin(0.5);
+
+        // Reset Progress Button
+        const resetBtn = this.add.rectangle(400, 400, 200, 40, 0x880000)
+            .setStrokeStyle(2, 0xff0000)
+            .setInteractive({ useHandCursor: true });
+
+        const resetText = this.add.text(400, 400, '🔄 RESET ALL PROGRESS', {
+            fontSize: '14px',
+            fill: '#ffffff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+
+        resetBtn.on('pointerover', () => {
+            resetBtn.setFillStyle(0xaa0000);
+        });
+
+        resetBtn.on('pointerout', () => {
+            resetBtn.setFillStyle(0x880000);
+        });
+
+        resetBtn.on('pointerdown', () => {
+            // Clear all saved data
+            localStorage.removeItem('playerUpgrades');
+            localStorage.setItem('unlockedLevels', '1');
+
+            // Show confirmation
+            const confirmText = this.add.text(400, 440, 'Progress Reset!', {
+                fontSize: '16px',
+                fill: '#ff4444',
+                fontStyle: 'bold'
+            }).setOrigin(0.5);
+
+            this.tweens.add({
+                targets: confirmText,
+                alpha: 0,
+                duration: 2000,
+                onComplete: () => confirmText.destroy()
+            });
+
+            // Refresh scene
+            this.time.delayedCall(500, () => {
+                this.scene.restart();
+            });
+        });
     }
 
     createLevelButton(x, y, level, unlocked) {

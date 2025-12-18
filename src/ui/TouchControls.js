@@ -1,8 +1,13 @@
-// Mobile touch controls for Android/iOS
+// Mobile touch controls for Android/iOS with virtual joystick
 class TouchControls {
     constructor(scene) {
         this.scene = scene;
         this.isEnabled = this.isMobileDevice();
+
+        // Joystick state
+        this.joystickX = 0; // -1 to 1
+        this.joystickY = 0; // -1 to 1
+        this.joystickActive = false;
 
         // Control states
         this.leftPressed = false;
@@ -24,7 +29,6 @@ class TouchControls {
     }
 
     isMobileDevice() {
-        // Check for touch support or mobile user agent
         return ('ontouchstart' in window) ||
             (navigator.maxTouchPoints > 0) ||
             /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -32,86 +36,134 @@ class TouchControls {
 
     createControls() {
         const depth = 1000;
-        const alpha = 0.6;
+        const alpha = 0.7;
 
-        // Left side - Movement controls
-        this.createMovementPad(depth, alpha);
+        // Left side - Virtual Joystick
+        this.createJoystick(depth, alpha);
 
         // Right side - Action buttons
         this.createActionButtons(depth, alpha);
     }
 
-    createMovementPad(depth, alpha) {
-        const padX = 120;
-        const padY = this.scene.cameras.main.height - 120;
+    createJoystick(depth, alpha) {
+        const baseX = 130;
+        const baseY = this.scene.cameras.main.height - 130;
+        const baseRadius = 70;
+        const handleRadius = 35;
 
-        // Movement pad background
-        this.movePadBg = this.scene.add.circle(padX, padY, 80, 0x333333, alpha)
+        // Joystick base (outer circle - dark green)
+        this.joystickBase = this.scene.add.circle(baseX, baseY, baseRadius, 0x2d5a27, alpha)
             .setScrollFactor(0)
-            .setDepth(depth);
+            .setDepth(depth)
+            .setStrokeStyle(4, 0x4a8a40);
 
-        // Left button
-        this.leftBtn = this.scene.add.circle(padX - 50, padY, 35, 0x4a90d9, alpha)
-            .setScrollFactor(0)
-            .setDepth(depth + 1)
-            .setInteractive();
-
-        this.leftArrow = this.scene.add.text(padX - 50, padY, '◀', {
-            fontSize: '28px',
-            fill: '#ffffff'
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
-
-        this.leftBtn.on('pointerdown', () => this.leftPressed = true);
-        this.leftBtn.on('pointerup', () => this.leftPressed = false);
-        this.leftBtn.on('pointerout', () => this.leftPressed = false);
-
-        // Right button
-        this.rightBtn = this.scene.add.circle(padX + 50, padY, 35, 0x4a90d9, alpha)
+        // Joystick handle (inner circle - white, draggable)
+        this.joystickHandle = this.scene.add.circle(baseX, baseY, handleRadius, 0xffffff, 0.9)
             .setScrollFactor(0)
             .setDepth(depth + 1)
-            .setInteractive();
+            .setInteractive({ draggable: true });
 
-        this.rightArrow = this.scene.add.text(padX + 50, padY, '▶', {
-            fontSize: '28px',
-            fill: '#ffffff'
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
+        // Store joystick center position
+        this.joystickCenterX = baseX;
+        this.joystickCenterY = baseY;
+        this.joystickMaxDistance = baseRadius - handleRadius / 2;
 
-        this.rightBtn.on('pointerdown', () => this.rightPressed = true);
-        this.rightBtn.on('pointerup', () => this.rightPressed = false);
-        this.rightBtn.on('pointerout', () => this.rightPressed = false);
-
-        // Jump button (center-up of pad)
-        this.jumpBtn = this.scene.add.circle(padX, padY - 50, 35, 0x50c878, alpha)
-            .setScrollFactor(0)
-            .setDepth(depth + 1)
-            .setInteractive();
-
-        this.jumpArrow = this.scene.add.text(padX, padY - 50, '▲', {
-            fontSize: '28px',
-            fill: '#ffffff'
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
-
-        this.jumpBtn.on('pointerdown', () => {
-            this.jumpPressed = true;
-            this.jumpJustPressed = true;
+        // Handle joystick input
+        this.joystickHandle.on('pointerdown', () => {
+            this.joystickActive = true;
         });
-        this.jumpBtn.on('pointerup', () => this.jumpPressed = false);
-        this.jumpBtn.on('pointerout', () => this.jumpPressed = false);
+
+        this.joystickHandle.on('pointermove', (pointer) => {
+            if (!this.joystickActive) return;
+            this.updateJoystickPosition(pointer.x, pointer.y);
+        });
+
+        this.joystickHandle.on('pointerup', () => {
+            this.resetJoystick();
+        });
+
+        this.joystickHandle.on('pointerout', () => {
+            this.resetJoystick();
+        });
+
+        // Also allow touching the base to start joystick
+        this.joystickBase.setInteractive();
+        this.joystickBase.on('pointerdown', (pointer) => {
+            this.joystickActive = true;
+            this.updateJoystickPosition(pointer.x, pointer.y);
+        });
+
+        this.joystickBase.on('pointermove', (pointer) => {
+            if (!this.joystickActive) return;
+            this.updateJoystickPosition(pointer.x, pointer.y);
+        });
+
+        this.joystickBase.on('pointerup', () => {
+            this.resetJoystick();
+        });
+    }
+
+    updateJoystickPosition(pointerX, pointerY) {
+        // Calculate distance from center
+        const dx = pointerX - this.joystickCenterX;
+        const dy = pointerY - this.joystickCenterY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Clamp to max distance
+        let handleX, handleY;
+        if (distance > this.joystickMaxDistance) {
+            const angle = Math.atan2(dy, dx);
+            handleX = this.joystickCenterX + Math.cos(angle) * this.joystickMaxDistance;
+            handleY = this.joystickCenterY + Math.sin(angle) * this.joystickMaxDistance;
+        } else {
+            handleX = pointerX;
+            handleY = pointerY;
+        }
+
+        // Update handle position
+        this.joystickHandle.x = handleX;
+        this.joystickHandle.y = handleY;
+
+        // Calculate normalized joystick values (-1 to 1)
+        this.joystickX = (handleX - this.joystickCenterX) / this.joystickMaxDistance;
+        this.joystickY = (handleY - this.joystickCenterY) / this.joystickMaxDistance;
+
+        // Update button states based on joystick position
+        this.leftPressed = this.joystickX < -0.3;
+        this.rightPressed = this.joystickX > 0.3;
+
+        // Jump when pushing up
+        if (this.joystickY < -0.5 && !this.jumpPressed) {
+            this.jumpJustPressed = true;
+        }
+        this.jumpPressed = this.joystickY < -0.5;
+    }
+
+    resetJoystick() {
+        this.joystickActive = false;
+        this.joystickHandle.x = this.joystickCenterX;
+        this.joystickHandle.y = this.joystickCenterY;
+        this.joystickX = 0;
+        this.joystickY = 0;
+        this.leftPressed = false;
+        this.rightPressed = false;
+        this.jumpPressed = false;
     }
 
     createActionButtons(depth, alpha) {
         const screenWidth = this.scene.cameras.main.width;
-        const btnX = screenWidth - 120;
-        const btnY = this.scene.cameras.main.height - 120;
+        const screenHeight = this.scene.cameras.main.height;
+        const btnX = screenWidth - 100;
+        const btnY = screenHeight - 100;
 
-        // Attack button (red, main action)
-        this.attackBtn = this.scene.add.circle(btnX, btnY, 45, 0xff4444, alpha)
+        // Attack button (red, main action - BIGGER)
+        this.attackBtn = this.scene.add.circle(btnX, btnY, 50, 0xff4444, alpha)
             .setScrollFactor(0)
             .setDepth(depth + 1)
             .setInteractive();
 
         this.attackText = this.scene.add.text(btnX, btnY, 'ATK', {
-            fontSize: '18px',
+            fontSize: '20px',
             fill: '#ffffff',
             fontStyle: 'bold'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
@@ -123,14 +175,14 @@ class TouchControls {
         this.attackBtn.on('pointerup', () => this.attackPressed = false);
         this.attackBtn.on('pointerout', () => this.attackPressed = false);
 
-        // Dash button (blue, secondary)
-        this.dashBtn = this.scene.add.circle(btnX - 70, btnY + 20, 35, 0x4488ff, alpha)
+        // Dash button (blue)
+        this.dashBtn = this.scene.add.circle(btnX - 80, btnY + 10, 40, 0x4488ff, alpha)
             .setScrollFactor(0)
             .setDepth(depth + 1)
             .setInteractive();
 
-        this.dashText = this.scene.add.text(btnX - 70, btnY + 20, 'DSH', {
-            fontSize: '14px',
+        this.dashText = this.scene.add.text(btnX - 80, btnY + 10, 'DSH', {
+            fontSize: '16px',
             fill: '#ffffff',
             fontStyle: 'bold'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
@@ -142,14 +194,14 @@ class TouchControls {
         this.dashBtn.on('pointerup', () => this.dashPressed = false);
         this.dashBtn.on('pointerout', () => this.dashPressed = false);
 
-        // Parry button (yellow, defensive)
-        this.parryBtn = this.scene.add.circle(btnX + 20, btnY - 70, 35, 0xffcc00, alpha)
+        // Parry button (yellow)
+        this.parryBtn = this.scene.add.circle(btnX + 10, btnY - 80, 40, 0xffcc00, alpha)
             .setScrollFactor(0)
             .setDepth(depth + 1)
             .setInteractive();
 
-        this.parryText = this.scene.add.text(btnX + 20, btnY - 70, 'PRY', {
-            fontSize: '14px',
+        this.parryText = this.scene.add.text(btnX + 10, btnY - 80, 'PRY', {
+            fontSize: '16px',
             fill: '#000000',
             fontStyle: 'bold'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
@@ -162,13 +214,13 @@ class TouchControls {
         this.parryBtn.on('pointerout', () => this.parryPressed = false);
 
         // Upgrade button (top right, purple)
-        this.upgradeBtn = this.scene.add.circle(screenWidth - 50, 50, 30, 0x9933ff, alpha)
+        this.upgradeBtn = this.scene.add.circle(screenWidth - 50, 50, 35, 0x9933ff, alpha)
             .setScrollFactor(0)
             .setDepth(depth + 1)
             .setInteractive();
 
         this.upgradeText = this.scene.add.text(screenWidth - 50, 50, 'UPG', {
-            fontSize: '12px',
+            fontSize: '14px',
             fill: '#ffffff',
             fontStyle: 'bold'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
@@ -222,10 +274,8 @@ class TouchControls {
     destroy() {
         if (!this.isEnabled) return;
 
-        // Clean up all UI elements
         const elements = [
-            this.movePadBg, this.leftBtn, this.leftArrow,
-            this.rightBtn, this.rightArrow, this.jumpBtn, this.jumpArrow,
+            this.joystickBase, this.joystickHandle,
             this.attackBtn, this.attackText, this.dashBtn, this.dashText,
             this.parryBtn, this.parryText, this.upgradeBtn, this.upgradeText
         ];
