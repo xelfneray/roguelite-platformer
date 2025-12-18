@@ -95,21 +95,21 @@ class Player extends Phaser.GameObjects.Sprite {
         if (leftDown) {
             this.body.setVelocityX(-this.speed);
             this.flipX = true;
-            // Play run animation if not already playing
-            if (!this.anims.isPlaying || this.anims.currentAnim.key !== 'player-run-anim') {
+            // Play run animation only if NOT attacking
+            if (!this.isAttacking && (!this.anims.isPlaying || this.anims.currentAnim.key !== 'player-run-anim')) {
                 this.play('player-run-anim', true);
             }
         } else if (rightDown) {
             this.body.setVelocityX(this.speed);
             this.flipX = false;
-            // Play run animation
-            if (!this.anims.isPlaying || this.anims.currentAnim.key !== 'player-run-anim') {
+            // Play run animation only if NOT attacking
+            if (!this.isAttacking && (!this.anims.isPlaying || this.anims.currentAnim.key !== 'player-run-anim')) {
                 this.play('player-run-anim', true);
             }
         } else {
             this.body.setVelocityX(0);
-            // Play idle animation when not moving
-            if (!this.anims.isPlaying || this.anims.currentAnim.key !== 'player-idle-anim') {
+            // Play idle animation when not moving and NOT attacking
+            if (!this.isAttacking && (!this.anims.isPlaying || this.anims.currentAnim.key !== 'player-idle-anim')) {
                 this.play('player-idle-anim', true);
             }
         }
