@@ -50,7 +50,7 @@ class GameScene extends Phaser.Scene {
 
         // Zoom out on mobile for better view
         if (this.touchControls && this.touchControls.isEnabled) {
-            this.cameras.main.setZoom(0.75);
+            this.cameras.main.setZoom(1.25);
         }
 
         // Listen to events
@@ -118,7 +118,7 @@ class GameScene extends Phaser.Scene {
 
     spawnHealthPacks() {
         // Spawn 5-8 health packs throughout the level
-        const packCount = Phaser.Math.Between(5, 8);
+        const packCount = Phaser.Math.Between(1, 3);
 
         for (let i = 0; i < packCount; i++) {
             const x = Phaser.Math.Between(800, this.levelLength - 300);
@@ -167,8 +167,8 @@ class GameScene extends Phaser.Scene {
         // Pole top (golden ball)
         this.add.circle(flagX, groundY - 200, 8, 0xFFD700);
 
-        // Invisible trigger zone for level completion
-        const triggerZone = this.add.rectangle(flagX, groundY - 50, 60, 100, 0x000000, 0);
+        const triggerZone = this.add.rectangle(flagX, groundY - 50, 60, 100);
+        triggerZone.setVisible(false);
         this.physics.add.existing(triggerZone, true);
 
         // Victory text
