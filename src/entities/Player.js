@@ -134,7 +134,7 @@ class Player extends Phaser.GameObjects.Sprite {
 
         // Attack - only trigger animation if weapon actually attacked
         const attackPressed = Phaser.Input.Keyboard.JustDown(this.keys.attack) || (hasTouch && tc.justPressed('attack'));
-        if (attackPressed) {
+        if (attackPressed && !this.isAttacking) {
             // For touch, attack in the direction the player is facing
             const attackX = this.flipX ? this.x - 100 : this.x + 100;
             const attackY = this.y;
@@ -146,19 +146,21 @@ class Player extends Phaser.GameObjects.Sprite {
                 // Check if player is moving
                 const isMoving = Math.abs(this.body.velocity.x) > 10;
 
+                // Stop current animation and play attack animation
+                this.anims.stop();
+
                 if (isMoving) {
                     // Play run-attack animation while moving
                     this.play('run-attack-anim', true);
-                    this.once('animationcomplete', () => {
-                        this.isAttacking = false;
-                    });
                 } else {
                     // For standing attack, use attacking.png animation
                     this.play('stand-attack-anim', true);
-                    this.once('animationcomplete', () => {
-                        this.isAttacking = false;
-                    });
                 }
+
+                // Use timer to reset isAttacking after animation duration (500ms = 8 frames at 16fps)
+                this.scene.time.delayedCall(500, () => {
+                    this.isAttacking = false;
+                });
             }
         }
 
