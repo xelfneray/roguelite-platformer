@@ -71,6 +71,7 @@ class GameScene extends Phaser.Scene {
 
     createPlatforms() {
         this.platforms = this.physics.add.staticGroup();
+        this.platformPositions = []; // Track platform positions
 
         // Ground
         const ground = this.add.rectangle(
@@ -83,22 +84,42 @@ class GameScene extends Phaser.Scene {
         this.physics.add.existing(ground, true);
         this.platforms.add(ground);
 
-        // RANDOMIZED platforms - different every time
+        // RANDOMIZED platforms - different every time, NO OVERLAP
         const platformCount = Phaser.Math.Between(5, 10);
-        for (let i = 0; i < platformCount; i++) {
+        let attempts = 0;
+        let created = 0;
+
+        while (created < platformCount && attempts < 50) {
             const x = Phaser.Math.Between(300, this.levelLength - 300);
             const y = Phaser.Math.Between(350, 480);
             const width = Phaser.Math.Between(80, 200);
 
-            const platform = this.add.rectangle(
-                x,
-                y,
-                width,
-                20,
-                GameConfig.colors.platform
-            );
-            this.physics.add.existing(platform, true);
-            this.platforms.add(platform);
+            // Check if this position overlaps with existing platforms
+            let overlaps = false;
+            for (const pos of this.platformPositions) {
+                const distX = Math.abs(x - pos.x);
+                const distY = Math.abs(y - pos.y);
+                // Check if too close (within combined widths + buffer)
+                if (distX < (width + pos.width) / 2 + 50 && distY < 60) {
+                    overlaps = true;
+                    break;
+                }
+            }
+
+            if (!overlaps) {
+                const platform = this.add.rectangle(
+                    x,
+                    y,
+                    width,
+                    20,
+                    GameConfig.colors.platform
+                );
+                this.physics.add.existing(platform, true);
+                this.platforms.add(platform);
+                this.platformPositions.push({ x, y, width });
+                created++;
+            }
+            attempts++;
         }
     }
 
@@ -173,6 +194,11 @@ class GameScene extends Phaser.Scene {
         const triggerZone = this.add.rectangle(flagX, groundY - 50, 60, 100);
         triggerZone.setVisible(false);
         this.physics.add.existing(triggerZone, true);
+
+        // INVISIBLE WALL for enemies - prevents them from entering finish zone
+        this.finishWall = this.add.rectangle(flagX - 80, groundY - 100, 20, 200);
+        this.finishWall.setVisible(false);
+        this.physics.add.existing(this.finishWall, true);
 
         // Victory text
         this.add.text(flagX, groundY - 220, 'FINISH', {
@@ -382,6 +408,8 @@ class GameScene extends Phaser.Scene {
         this.physics.collide(this.player, this.platforms);
         this.enemyManager.enemies.forEach(enemy => {
             this.physics.collide(enemy, this.platforms);
+            // Collide enemies with finish wall - prevents them from entering finish zone
+            this.physics.collide(enemy, this.finishWall);
             // Don't use collide - it blocks player movement when enemy is underneath
             // Instead, use overlap to push enemies away when too close
             if (this.physics.overlap(this.player, enemy)) {

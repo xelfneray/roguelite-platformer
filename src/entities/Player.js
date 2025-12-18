@@ -15,7 +15,7 @@ class Player extends Phaser.GameObjects.Sprite {
         scene.physics.add.existing(this);
 
         // Set sprite properties
-        this.setScale(0.725); // 45% larger than before
+        this.setScale(1.25); // 45% larger than before
         this.setOrigin(0.5, 0.5);
 
         // Physics setup - adjust hitbox to match sprite
