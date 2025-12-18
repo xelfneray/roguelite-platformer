@@ -158,17 +158,17 @@ class TouchControls {
     createActionButtons(depth, alpha) {
         const screenWidth = this.scene.cameras.main.width;
         const screenHeight = this.scene.cameras.main.height;
-        const btnX = screenWidth - 100;
-        const btnY = screenHeight - 100;
+        const btnX = screenWidth - 120;
+        const btnY = screenHeight - 120;
 
         // Attack button (red, main action - BIGGER)
-        this.attackBtn = this.scene.add.circle(btnX, btnY, 50, 0xff4444, alpha)
+        this.attackBtn = this.scene.add.circle(btnX, btnY, 65, 0xff4444, alpha)
             .setScrollFactor(0)
             .setDepth(depth + 1)
             .setInteractive();
 
         this.attackText = this.scene.add.text(btnX, btnY, 'ATK', {
-            fontSize: '20px',
+            fontSize: '24px',
             fill: '#ffffff',
             fontStyle: 'bold'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
@@ -181,13 +181,13 @@ class TouchControls {
         this.attackBtn.on('pointerout', () => this.attackPressed = false);
 
         // Dash button (blue)
-        this.dashBtn = this.scene.add.circle(btnX - 80, btnY + 10, 40, 0x4488ff, alpha)
+        this.dashBtn = this.scene.add.circle(btnX - 100, btnY + 10, 50, 0x4488ff, alpha)
             .setScrollFactor(0)
             .setDepth(depth + 1)
             .setInteractive();
 
-        this.dashText = this.scene.add.text(btnX - 80, btnY + 10, 'DSH', {
-            fontSize: '16px',
+        this.dashText = this.scene.add.text(btnX - 100, btnY + 10, 'DSH', {
+            fontSize: '20px',
             fill: '#ffffff',
             fontStyle: 'bold'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
@@ -200,13 +200,13 @@ class TouchControls {
         this.dashBtn.on('pointerout', () => this.dashPressed = false);
 
         // Parry button (yellow)
-        this.parryBtn = this.scene.add.circle(btnX + 10, btnY - 80, 40, 0xffcc00, alpha)
+        this.parryBtn = this.scene.add.circle(btnX + 10, btnY - 100, 50, 0xffcc00, alpha)
             .setScrollFactor(0)
             .setDepth(depth + 1)
             .setInteractive();
 
-        this.parryText = this.scene.add.text(btnX + 10, btnY - 80, 'PRY', {
-            fontSize: '16px',
+        this.parryText = this.scene.add.text(btnX + 10, btnY - 100, 'PRY', {
+            fontSize: '20px',
             fill: '#000000',
             fontStyle: 'bold'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);

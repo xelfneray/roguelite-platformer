@@ -70,25 +70,8 @@ class HUD {
             this.weaponText.setText(`Weapon: ${safeWeapon}`);
         }
 
-        // Health bar with improved color coding
+        // Health bar removed - only using text display
         this.graphics.clear();
-
-        // Background
-        this.graphics.fillStyle(0x000000, 0.5);
-        this.graphics.fillRect(20, 110, 200, 20);
-
-        // Health - color-coded: green 66-100%, yellow 41-65%, red 0-40%
-        const healthPercent = Math.max(0, this.health / this.maxHealth);
-        let barColor;
-        if (healthPercent > 0.65) {
-            barColor = 0x00ff00; // Green
-        } else if (healthPercent > 0.40) {
-            barColor = 0xffff00; // Yellow
-        } else {
-            barColor = 0xff0000; // Red
-        }
-        this.graphics.fillStyle(barColor);
-        this.graphics.fillRect(20, 110, 200 * healthPercent, 20);
     }
 
     destroy() {

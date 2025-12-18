@@ -28,15 +28,17 @@ class GameScene extends Phaser.Scene {
         this.touchControls = new TouchControls(this);
         this.player.touchControls = this.touchControls;
 
+        // Create HUD first
+        this.hud = new HUD(this);
+
         // Apply saved upgrades to player
         this.applyLoadedUpgrades();
 
-        // Create HUD
-        this.hud = new HUD(this);
-
-        // Update HUD with initial values immediately
+        // Update HUD with initial values immediately after upgrades are applied
         this.events.emit('coinsChanged', this.upgradeManager.coins);
         this.events.emit('playerHealthChanged', this.player.health, this.player.maxHealth);
+        const weapon = this.player.weaponManager.getCurrentWeapon();
+        this.events.emit('weaponSwitched', `Sword Lv.${weapon.level}`);
 
         // Health packs array
         this.healthPacks = [];
@@ -307,11 +309,6 @@ class GameScene extends Phaser.Scene {
         // Apply weapon level - directly set it
         const weapon = this.player.weaponManager.getCurrentWeapon();
         weapon.level = upgrades.weaponLevel || 0;
-        this.events.emit('weaponSwitched', `Sword Lv.${weapon.level}`);
-
-        if (weapon.level > 0) {
-            this.events.emit('weaponSwitched', `Sword Lv.${weapon.level}`);
-        }
 
         // Apply health upgrades
         if (upgrades.health > 0) {
