@@ -108,9 +108,10 @@ class Player extends Phaser.GameObjects.Sprite {
             }
         } else {
             this.body.setVelocityX(0);
-            // Show idle when not moving
-            this.anims.stop();
-            this.setTexture('player-idle');
+            // Play idle animation when not moving
+            if (!this.anims.isPlaying || this.anims.currentAnim.key !== 'player-idle-anim') {
+                this.play('player-idle-anim', true);
+            }
         }
 
         // Jump - more responsive, can jump immediately on landing

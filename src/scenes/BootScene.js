@@ -12,7 +12,10 @@ class BootScene extends Phaser.Scene {
         });
 
         // Load player sprites
-        this.load.image('player-idle', 'player-idle.png'); // Single 128x128 frame
+        this.load.spritesheet('player-idle', 'player-idle.png', {
+            frameWidth: 128,  // 4 frames, each 128px wide
+            frameHeight: 128
+        });
         this.load.spritesheet('player-run', 'player-run.png', {
             frameWidth: 128,
             frameHeight: 128
@@ -49,6 +52,14 @@ class BootScene extends Phaser.Scene {
             key: 'player-run-anim',
             frames: this.anims.generateFrameNumbers('player-run', { start: 0, end: 5 }),
             frameRate: 12,
+            repeat: -1 // Loop forever
+        });
+
+        // Create player idle animation (4 frames)
+        this.anims.create({
+            key: 'player-idle-anim',
+            frames: this.anims.generateFrameNumbers('player-idle', { start: 0, end: 3 }),
+            frameRate: 6,
             repeat: -1 // Loop forever
         });
 
