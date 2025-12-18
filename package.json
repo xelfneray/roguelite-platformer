@@ -2,11 +2,35 @@
   "name": "roguelite-platformer",
   "version": "1.0.0",
   "description": "A skill-based roguelite platformer with weapon evolution and randomized encounters",
-  "main": "src/main.js",
+  "main": "electron-main.js",
   "scripts": {
     "dev": "npx -y http-server . -p 8080 -o",
     "start": "npx -y http-server . -p 8080 -o",
+    "electron": "electron .",
+    "build:win": "electron-builder --win portable",
     "build:android": "npx cap sync android && npx cap build android"
+  },
+  "build": {
+    "appId": "com.roguelite.platformer",
+    "productName": "Roguelite Platformer",
+    "directories": {
+      "output": "windows-build"
+    },
+    "files": [
+      "index.html",
+      "electron-main.js",
+      "src/**/*",
+      "*.png",
+      "*.json",
+      "!node_modules/**/*",
+      "!android/**/*",
+      "!dist/**/*",
+      "!*.apk"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": null
+    }
   },
   "keywords": [
     "game",
@@ -23,6 +47,11 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^6.0.0",
+    "@electron/packager": "^19.0.1",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "nw": "^0.106.0-sdk",
+    "nw-builder": "^4.16.0",
     "typescript": "^5.9.3"
   }
 }

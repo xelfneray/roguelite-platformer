@@ -1,0 +1,13 @@
+{
+    "name": "roguelite-platformer",
+    "main": "index.html",
+    "window": {
+        "title": "Roguelite Platformer",
+        "width": 960,
+        "height": 640,
+        "min_width": 800,
+        "min_height": 600,
+        "position": "center",
+        "toolbar": false
+    }
+}
