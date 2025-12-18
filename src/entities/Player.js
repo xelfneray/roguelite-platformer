@@ -95,21 +95,69 @@ class Player extends Phaser.GameObjects.Sprite {
         const tc = this.touchControls;
         const hasTouch = tc && tc.isEnabled;
 
-        // Horizontal movement (velocity only, not animation)
+        // Attack - handle attack first
+        const attackPressed = Phaser.Input.Keyboard.JustDown(this.keys.attack) || (hasTouch && tc.justPressed('attack'));
+        if (attackPressed) {
+            this.handleAttack();
+        }
+
+        // Dash
+        const dashPressed = Phaser.Input.Keyboard.JustDown(this.keys.dash) || (hasTouch && tc.justPressed('dash'));
+        if (dashPressed) {
+            this.performDash();
+        }
+
+        // Parry
+        const parryPressed = Phaser.Input.Keyboard.JustDown(this.keys.parry) || (hasTouch && tc.justPressed('parry'));
+        if (parryPressed) {
+            this.parrySystem.attemptParry();
+        }
+
+        // *** ATTACK ANIMATION CHECK - IF PLAYING, SKIP MOVEMENT ANIMATIONS ***
+        if (this.anims.isPlaying &&
+            (this.anims.currentAnim.key === 'stand-attack-anim' || this.anims.currentAnim.key === 'run-attack-anim')) {
+            // Still allow movement velocity but don't change animation
+            const leftDown = this.cursors.left.isDown || (hasTouch && tc.isDown('left'));
+            const rightDown = this.cursors.right.isDown || (hasTouch && tc.isDown('right'));
+
+            if (leftDown) {
+                this.body.setVelocityX(-this.speed);
+                this.flipX = true;
+            } else if (rightDown) {
+                this.body.setVelocityX(this.speed);
+                this.flipX = false;
+            } else {
+                this.body.setVelocityX(0);
+            }
+
+            // Jump still allowed during attack
+            const jumpPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up) || (hasTouch && tc.justPressed('jump'));
+            if (jumpPressed) {
+                if (this.body.onFloor() || this.body.touching.down) {
+                    this.body.setVelocityY(this.jumpForce);
+                }
+            }
+            return; // Skip run/idle animations
+        }
+
+        // *** NORMAL MOVEMENT + ANIMATION (only if not attacking) ***
         const leftDown = this.cursors.left.isDown || (hasTouch && tc.isDown('left'));
         const rightDown = this.cursors.right.isDown || (hasTouch && tc.isDown('right'));
 
         if (leftDown) {
             this.body.setVelocityX(-this.speed);
             this.flipX = true;
+            this.play('player-run-anim', true);
         } else if (rightDown) {
             this.body.setVelocityX(this.speed);
             this.flipX = false;
+            this.play('player-run-anim', true);
         } else {
             this.body.setVelocityX(0);
+            this.play('player-idle-anim', true);
         }
 
-        // Jump - more responsive, can jump immediately on landing
+        // Jump
         const jumpPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up) || (hasTouch && tc.justPressed('jump'));
         if (jumpPressed) {
             if (this.body.onFloor() || this.body.touching.down) {
@@ -120,93 +168,27 @@ class Player extends Phaser.GameObjects.Sprite {
                 this.hasDoubleJumped = true;
             }
         }
-
-        // Dash
-        const dashPressed = Phaser.Input.Keyboard.JustDown(this.keys.dash) || (hasTouch && tc.justPressed('dash'));
-        if (dashPressed) {
-            this.performDash();
-        }
-
-        // Attack - start attack animation
-        const attackPressed = Phaser.Input.Keyboard.JustDown(this.keys.attack) || (hasTouch && tc.justPressed('attack'));
-        if (attackPressed && !this.isAttacking) {
-            this.startAttack();
-        }
-
-        // UPDATE ANIMATION (manual frame control)
-        this.updateAnimation();
-
-        // Parry
-        const parryPressed = Phaser.Input.Keyboard.JustDown(this.keys.parry) || (hasTouch && tc.justPressed('parry'));
-        if (parryPressed) {
-            this.parrySystem.attemptParry();
-        }
     }
 
-    // Start attack - set animation to attack mode
-    startAttack() {
-        if (this.isAttacking) return; // Already attacking
+    // Handle attack - check if already attacking, then play animation
+    handleAttack() {
+        // If attack animation is already playing, don't start new one
+        if (this.anims.currentAnim &&
+            (this.anims.currentAnim.key === 'stand-attack-anim' || this.anims.currentAnim.key === 'run-attack-anim') &&
+            this.anims.isPlaying) {
+            return;
+        }
 
         // Do the actual weapon attack
         const attackX = this.flipX ? this.x - 100 : this.x + 100;
         const attackY = this.y;
-        const didAttack = this.weaponManager.attack(attackX, attackY);
-
-        if (!didAttack) return;
-
-        this.isAttacking = true;
-        this.currentFrame = 0; // Start animation from beginning
-        this.frameCounter = 0;
+        this.weaponManager.attack(attackX, attackY);
 
         // Choose animation based on movement
         if (Math.abs(this.body.velocity.x) > 10) {
-            this.currentAnimKey = 'run-to-attack';
-            this.currentAnimLength = 7; // 7 frames
+            this.play('run-attack-anim');
         } else {
-            this.currentAnimKey = 'attacking';
-            this.currentAnimLength = 7; // 7 frames
-        }
-
-        // Set texture to attack spritesheet
-        this.setTexture(this.currentAnimKey, 0);
-    }
-
-    // Update animation - manual frame control
-    updateAnimation() {
-        this.frameCounter++;
-
-        if (this.frameCounter >= this.animationSpeed) {
-            this.currentFrame++;
-            this.frameCounter = 0;
-        }
-
-        // ATTACKING - priority animation
-        if (this.isAttacking) {
-            // Check if attack animation finished
-            if (this.currentFrame >= this.currentAnimLength) {
-                this.isAttacking = false;
-                this.currentFrame = 0;
-                // Will switch to run/idle on next frame
-            } else {
-                // Show current attack frame
-                this.setTexture(this.currentAnimKey, this.currentFrame);
-            }
-        }
-        // NOT ATTACKING - normal movement animation
-        else {
-            if (Math.abs(this.body.velocity.x) > 10) {
-                // Running
-                this.currentAnimKey = 'player-run';
-                this.currentAnimLength = 6;
-            } else {
-                // Idle
-                this.currentAnimKey = 'player-idle';
-                this.currentAnimLength = 4;
-            }
-
-            // Loop animation
-            this.currentFrame = this.currentFrame % this.currentAnimLength;
-            this.setTexture(this.currentAnimKey, this.currentFrame);
+            this.play('stand-attack-anim');
         }
     }
 
