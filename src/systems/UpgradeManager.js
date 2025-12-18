@@ -32,13 +32,6 @@ class UpgradeManager {
         }
 
         console.log('Loaded upgrades:', this.currentUpgrades, 'Coins:', this.coins);
-
-        // Emit initial coin count after a short delay to ensure HUD is ready
-        if (scene && scene.time) {
-            scene.time.delayedCall(100, () => {
-                this.scene.events.emit('coinsChanged', this.coins);
-            });
-        }
     }
 
     initializeDefaults() {

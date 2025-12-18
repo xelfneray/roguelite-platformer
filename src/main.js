@@ -1,19 +1,19 @@
 // Main game initialization
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 450,
+    width: 1280,
+    height: 720,
     parent: 'game-container',
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         min: {
-            width: 400,
-            height: 225
+            width: 640,
+            height: 360
         },
         max: {
-            width: 1600,
-            height: 900
+            width: 1920,
+            height: 1080
         }
     },
     input: {

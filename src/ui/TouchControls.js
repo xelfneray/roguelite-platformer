@@ -132,11 +132,16 @@ class TouchControls {
         this.leftPressed = this.joystickX < -0.3;
         this.rightPressed = this.joystickX > 0.3;
 
-        // Jump when pushing up
-        if (this.joystickY < -0.5 && !this.jumpPressed) {
+        // Jump when pushing upward (between 9 o'clock and 3 o'clock)
+        // Y < 0 means upper half, threshold of -0.3 for sensitivity
+        const isInUpperHalf = this.joystickY < -0.3;
+        const distanceFromCenter = Math.sqrt(this.joystickX * this.joystickX + this.joystickY * this.joystickY);
+        const isMovedEnough = distanceFromCenter > 0.4;
+
+        if (isInUpperHalf && isMovedEnough && !this.jumpPressed) {
             this.jumpJustPressed = true;
         }
-        this.jumpPressed = this.joystickY < -0.5;
+        this.jumpPressed = isInUpperHalf && isMovedEnough;
     }
 
     resetJoystick() {
