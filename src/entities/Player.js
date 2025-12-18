@@ -148,17 +148,29 @@ class Player extends Phaser.GameObjects.Sprite {
         if (leftDown) {
             this.body.setVelocityX(-this.speed);
             this.flipX = true;
-            this.play('player-run-anim', true);
-            this.wasRunning = true;  // FLAG: Player is running
+            // If not already running, start with intro then switch to loop
+            if (!this.wasRunning) {
+                this.play('player-run-intro');
+                this.once('animationcomplete-player-run-intro', () => {
+                    if (this.wasRunning) this.play('player-run-anim', true);
+                });
+            }
+            this.wasRunning = true;
         } else if (rightDown) {
             this.body.setVelocityX(this.speed);
             this.flipX = false;
-            this.play('player-run-anim', true);
-            this.wasRunning = true;  // FLAG: Player is running
+            // If not already running, start with intro then switch to loop
+            if (!this.wasRunning) {
+                this.play('player-run-intro');
+                this.once('animationcomplete-player-run-intro', () => {
+                    if (this.wasRunning) this.play('player-run-anim', true);
+                });
+            }
+            this.wasRunning = true;
         } else {
             this.body.setVelocityX(0);
             this.play('player-idle-anim', true);
-            this.wasRunning = false; // FLAG: Player stopped
+            this.wasRunning = false;
         }
 
         // Jump
