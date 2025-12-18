@@ -95,7 +95,14 @@ class Player extends Phaser.GameObjects.Sprite {
         const tc = this.touchControls;
         const hasTouch = tc && tc.isEnabled;
 
-        // Attack - handle attack first
+        // Get movement input FIRST (before attack check)
+        const leftDown = this.cursors.left.isDown || (hasTouch && tc.isDown('left'));
+        const rightDown = this.cursors.right.isDown || (hasTouch && tc.isDown('right'));
+
+        // Store if player is moving for attack animation selection
+        this.isMovingInput = leftDown || rightDown;
+
+        // Attack - handle attack (now knows if player is trying to move)
         const attackPressed = Phaser.Input.Keyboard.JustDown(this.keys.attack) || (hasTouch && tc.justPressed('attack'));
         if (attackPressed) {
             this.handleAttack();
@@ -117,9 +124,6 @@ class Player extends Phaser.GameObjects.Sprite {
         if (this.anims.isPlaying &&
             (this.anims.currentAnim.key === 'stand-attack-anim' || this.anims.currentAnim.key === 'run-attack-anim')) {
             // Still allow movement velocity but don't change animation
-            const leftDown = this.cursors.left.isDown || (hasTouch && tc.isDown('left'));
-            const rightDown = this.cursors.right.isDown || (hasTouch && tc.isDown('right'));
-
             if (leftDown) {
                 this.body.setVelocityX(-this.speed);
                 this.flipX = true;
@@ -141,9 +145,6 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
         // *** NORMAL MOVEMENT + ANIMATION (only if not attacking) ***
-        const leftDown = this.cursors.left.isDown || (hasTouch && tc.isDown('left'));
-        const rightDown = this.cursors.right.isDown || (hasTouch && tc.isDown('right'));
-
         if (leftDown) {
             this.body.setVelocityX(-this.speed);
             this.flipX = true;
@@ -184,8 +185,8 @@ class Player extends Phaser.GameObjects.Sprite {
         const attackY = this.y;
         this.weaponManager.attack(attackX, attackY);
 
-        // Choose animation based on movement
-        if (Math.abs(this.body.velocity.x) > 10) {
+        // Choose animation based on movement INPUT (not velocity)
+        if (this.isMovingInput) {
             this.play('run-attack-anim');
         } else {
             this.play('stand-attack-anim');
