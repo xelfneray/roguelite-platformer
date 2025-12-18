@@ -149,13 +149,16 @@ class Player extends Phaser.GameObjects.Sprite {
             this.body.setVelocityX(-this.speed);
             this.flipX = true;
             this.play('player-run-anim', true);
+            this.wasRunning = true;  // FLAG: Player is running
         } else if (rightDown) {
             this.body.setVelocityX(this.speed);
             this.flipX = false;
             this.play('player-run-anim', true);
+            this.wasRunning = true;  // FLAG: Player is running
         } else {
             this.body.setVelocityX(0);
             this.play('player-idle-anim', true);
+            this.wasRunning = false; // FLAG: Player stopped
         }
 
         // Jump
@@ -185,22 +188,8 @@ class Player extends Phaser.GameObjects.Sprite {
         const attackY = this.y;
         this.weaponManager.attack(attackX, attackY);
 
-        // Check joystick DIRECTLY using joystickActive and joystickX
-        const tc = this.touchControls;
-        let isJoystickPushed = false;
-
-        if (tc && tc.isEnabled && tc.joystickActive) {
-            // Joystick is active AND being pushed left or right (threshold 0.3)
-            isJoystickPushed = Math.abs(tc.joystickX) > 0.3;
-        }
-
-        // Also check keyboard
-        const keyboardMoving = this.cursors.left.isDown || this.cursors.right.isDown;
-
-        // Check ALL conditions: joystick pushed, keyboard, velocity
-        const isRunning = isJoystickPushed || keyboardMoving || Math.abs(this.body.velocity.x) > 20;
-
-        if (isRunning) {
+        // SIMPLE: Use wasRunning flag (set in movement code)
+        if (this.wasRunning) {
             this.play('run-attack-anim');
         } else {
             this.play('stand-attack-anim');
