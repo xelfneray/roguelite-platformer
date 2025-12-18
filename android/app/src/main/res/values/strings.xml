@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Roguelite Platformer</string>
+    <string name="title_activity_main">Roguelite Platformer</string>
+    <string name="package_name">com.roguelite.platformer</string>
+    <string name="custom_url_scheme">com.roguelite.platformer</string>
+</resources>

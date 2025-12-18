@@ -49,6 +49,9 @@ class Player extends Phaser.GameObjects.Sprite {
         this.weaponManager = new WeaponManager(scene, this);
         this.parrySystem = new ParrySystem(scene, this);
 
+        // Touch controls reference (set by scene on mobile)
+        this.touchControls = null;
+
         // Visual sword - using pixel art sprite (first frame of slash)
         this.sword = scene.add.sprite(0, 0, 'sword-slash', 0);
         this.sword.setOrigin(0, 0.5);
@@ -81,15 +84,22 @@ class Player extends Phaser.GameObjects.Sprite {
             this.sword.setRotation(0);
         }
 
+        // Check for touch controls
+        const tc = this.touchControls;
+        const hasTouch = tc && tc.isEnabled;
+
         // Horizontal movement + animation
-        if (this.cursors.left.isDown) {
+        const leftDown = this.cursors.left.isDown || (hasTouch && tc.isDown('left'));
+        const rightDown = this.cursors.right.isDown || (hasTouch && tc.isDown('right'));
+
+        if (leftDown) {
             this.body.setVelocityX(-this.speed);
             this.flipX = true;
             // Play run animation if not already playing
             if (!this.anims.isPlaying || this.anims.currentAnim.key !== 'player-run-anim') {
                 this.play('player-run-anim', true);
             }
-        } else if (this.cursors.right.isDown) {
+        } else if (rightDown) {
             this.body.setVelocityX(this.speed);
             this.flipX = false;
             // Play run animation
@@ -104,7 +114,8 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
         // Jump - more responsive, can jump immediately on landing
-        if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+        const jumpPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up) || (hasTouch && tc.justPressed('jump'));
+        if (jumpPressed) {
             if (this.body.onFloor() || this.body.touching.down) {
                 this.body.setVelocityY(this.jumpForce);
                 this.hasDoubleJumped = false;
@@ -115,14 +126,18 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
         // Dash
-        if (Phaser.Input.Keyboard.JustDown(this.keys.dash)) {
+        const dashPressed = Phaser.Input.Keyboard.JustDown(this.keys.dash) || (hasTouch && tc.justPressed('dash'));
+        if (dashPressed) {
             this.performDash();
         }
 
         // Attack - only trigger animation if weapon actually attacked
-        if (Phaser.Input.Keyboard.JustDown(this.keys.attack)) {
-            const pointer = this.scene.input.activePointer;
-            const didAttack = this.weaponManager.attack(pointer.worldX, pointer.worldY);
+        const attackPressed = Phaser.Input.Keyboard.JustDown(this.keys.attack) || (hasTouch && tc.justPressed('attack'));
+        if (attackPressed) {
+            // For touch, attack in the direction the player is facing
+            const attackX = this.flipX ? this.x - 100 : this.x + 100;
+            const attackY = this.y;
+            const didAttack = this.weaponManager.attack(attackX, attackY);
 
             if (didAttack) {
                 this.isAttacking = true;
@@ -131,7 +146,8 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
         // Parry
-        if (Phaser.Input.Keyboard.JustDown(this.keys.parry)) {
+        const parryPressed = Phaser.Input.Keyboard.JustDown(this.keys.parry) || (hasTouch && tc.justPressed('parry'));
+        if (parryPressed) {
             this.parrySystem.attemptParry();
         }
     }

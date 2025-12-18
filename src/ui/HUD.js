@@ -60,9 +60,15 @@ class HUD {
         const safeCoins = this.coins || 0;
         const safeWeapon = this.currentWeapon || 'Sword Lv.0';
 
-        this.healthText.setText(`HP: ${safeHealth}/${safeMaxHealth}`);
-        this.coinsText.setText(`Coins: ${safeCoins}`);
-        this.weaponText.setText(`Weapon: ${safeWeapon}`);
+        if (this.healthText && this.healthText.active) {
+            this.healthText.setText(`HP: ${safeHealth}/${safeMaxHealth}`);
+        }
+        if (this.coinsText && this.coinsText.active) {
+            this.coinsText.setText(`Coins: ${safeCoins}`);
+        }
+        if (this.weaponText && this.weaponText.active) {
+            this.weaponText.setText(`Weapon: ${safeWeapon}`);
+        }
 
         // Health bar with improved color coding
         this.graphics.clear();

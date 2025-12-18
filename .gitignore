@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build outputs (keep APK)
+dist/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

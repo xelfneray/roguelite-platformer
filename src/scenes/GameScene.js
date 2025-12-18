@@ -24,6 +24,10 @@ class GameScene extends Phaser.Scene {
         // Create player
         this.player = new Player(this, 100, 300);
 
+        // Create touch controls for mobile
+        this.touchControls = new TouchControls(this);
+        this.player.touchControls = this.touchControls;
+
         // Apply saved upgrades to player
         this.applyLoadedUpgrades();
 
@@ -48,8 +52,10 @@ class GameScene extends Phaser.Scene {
         this.upgradeMenuActive = false;
         this.createUpgradeMenu();
 
-        // Tutorial text
-        this.showTutorial();
+        // Tutorial text (only show on desktop)
+        if (!this.touchControls.isEnabled) {
+            this.showTutorial();
+        }
     }
 
     createPlatforms() {
