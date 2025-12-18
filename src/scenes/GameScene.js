@@ -50,7 +50,7 @@ class GameScene extends Phaser.Scene {
 
         // Zoom out on mobile for better view
         if (this.touchControls && this.touchControls.isEnabled) {
-            this.cameras.main.setZoom(1.25);
+            this.cameras.main.setZoom(1);
         }
 
         // Listen to events

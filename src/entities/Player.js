@@ -142,7 +142,24 @@ class Player extends Phaser.GameObjects.Sprite {
 
             if (didAttack) {
                 this.isAttacking = true;
-                this.swordAngle = -45; // Start swing from 45 degrees back
+
+                // Check if player is moving
+                const isMoving = Math.abs(this.body.velocity.x) > 10;
+
+                if (isMoving) {
+                    // Play run-attack animation while moving
+                    this.play('run-attack-anim', true);
+                    this.once('animationcomplete', () => {
+                        this.isAttacking = false;
+                    });
+                } else {
+                    // For standing attack, use last frame of idle (sword raised)
+                    // Or play the idle attack from the run-attack first frames
+                    this.play('run-attack-anim', true);
+                    this.once('animationcomplete', () => {
+                        this.isAttacking = false;
+                    });
+                }
             }
         }
 

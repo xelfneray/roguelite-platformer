@@ -21,6 +21,12 @@ class BootScene extends Phaser.Scene {
             frameHeight: 128
         });
 
+        // Load attack sprites
+        this.load.spritesheet('run-to-attack', 'run-to-attack.png', {
+            frameWidth: 128,  // 8 frames for run-attack animation
+            frameHeight: 128
+        });
+
         console.log('Loading player and sword sprites...');
 
         // Add loading text
@@ -61,6 +67,14 @@ class BootScene extends Phaser.Scene {
             frames: this.anims.generateFrameNumbers('player-idle', { start: 0, end: 3 }),
             frameRate: 6,
             repeat: -1 // Loop forever
+        });
+
+        // Create run-attack animation (8 frames)
+        this.anims.create({
+            key: 'run-attack-anim',
+            frames: this.anims.generateFrameNumbers('run-to-attack', { start: 0, end: 7 }),
+            frameRate: 16,
+            repeat: 0 // Play once
         });
 
         // Start hub menu

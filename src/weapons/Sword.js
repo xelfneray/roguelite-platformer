@@ -287,31 +287,7 @@ class Sword {
     }
 
     createSlashEffect() {
-        const direction = this.player.flipX ? -1 : 1;
-
-        // Create animated sprite slash
-        const slash = this.scene.add.sprite(
-            this.player.x + (direction * 40),
-            this.player.y,
-            'sword-slash'
-        );
-
-        // Flip based on direction
-        slash.setFlipX(direction < 0);
-
-        // Scale and depth
-        slash.setScale(2.5);
-        slash.setDepth(100);
-
-        // Play animation
-        slash.play('slash-anim');
-
-        // Destroy after animation completes
-        slash.on('animationcomplete', () => {
-            slash.destroy();
-        });
-
-        console.log('Sword slash animation playing!');
+        // Removed - now using player attack sprites instead
     }
 
     showCooldownIndicator(remainingMs) {
