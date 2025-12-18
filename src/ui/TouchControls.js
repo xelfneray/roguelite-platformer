@@ -160,6 +160,24 @@ class TouchControls {
         });
         this.parryBtn.on('pointerup', () => this.parryPressed = false);
         this.parryBtn.on('pointerout', () => this.parryPressed = false);
+
+        // Upgrade button (top right, purple)
+        this.upgradeBtn = this.scene.add.circle(screenWidth - 50, 50, 30, 0x9933ff, alpha)
+            .setScrollFactor(0)
+            .setDepth(depth + 1)
+            .setInteractive();
+
+        this.upgradeText = this.scene.add.text(screenWidth - 50, 50, 'UPG', {
+            fontSize: '12px',
+            fill: '#ffffff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(depth + 2);
+
+        this.upgradeBtn.on('pointerdown', () => {
+            if (this.scene.toggleUpgradeMenu) {
+                this.scene.toggleUpgradeMenu();
+            }
+        });
     }
 
     // Check if a "just pressed" action happened (single fire)
@@ -209,7 +227,7 @@ class TouchControls {
             this.movePadBg, this.leftBtn, this.leftArrow,
             this.rightBtn, this.rightArrow, this.jumpBtn, this.jumpArrow,
             this.attackBtn, this.attackText, this.dashBtn, this.dashText,
-            this.parryBtn, this.parryText
+            this.parryBtn, this.parryText, this.upgradeBtn, this.upgradeText
         ];
 
         elements.forEach(el => {

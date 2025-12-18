@@ -227,16 +227,16 @@ class BaseEnemy extends Phaser.GameObjects.Rectangle {
             }
         });
 
-        // Drop coins (reduced for balance - target 200-250 per level)
+        // Drop coins (3x boost for mobile testing)
         if (this.scene.upgradeManager) {
-            this.scene.upgradeManager.addCoins(5); // Reduced from 30
+            this.scene.upgradeManager.addCoins(15); // 3x boost
         }
 
         // Coin visual
         const coinText = this.scene.add.text(
             this.x,
             this.y,
-            '+5',
+            '+15',
             { fontSize: '18px', fill: '#ffd700', fontStyle: 'bold' }
         );
 

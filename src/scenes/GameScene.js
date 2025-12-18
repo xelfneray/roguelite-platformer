@@ -44,6 +44,11 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
         this.cameras.main.setBounds(0, 0, this.levelLength, 600);
 
+        // Zoom out on mobile for better view
+        if (this.touchControls && this.touchControls.isEnabled) {
+            this.cameras.main.setZoom(0.7);
+        }
+
         // Listen to events
         this.events.on('playerDied', this.onPlayerDeath, this);
         this.events.on('toggleUpgradeMenu', this.toggleUpgradeMenu, this);
