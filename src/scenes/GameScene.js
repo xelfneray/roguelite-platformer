@@ -309,6 +309,10 @@ class GameScene extends Phaser.Scene {
         weapon.level = upgrades.weaponLevel || 0;
         this.events.emit('weaponSwitched', `Sword Lv.${weapon.level}`);
 
+        if (weapon.level > 0) {
+            this.events.emit('weaponSwitched', `Sword Lv.${weapon.level}`);
+        }
+
         // Apply health upgrades
         if (upgrades.health > 0) {
             this.player.maxHealth += upgrades.health * 50;
