@@ -26,6 +26,10 @@ class BootScene extends Phaser.Scene {
             frameWidth: 128,  // 8 frames for run-attack animation
             frameHeight: 128
         });
+        this.load.spritesheet('attacking', 'attacking.png', {
+            frameWidth: 128,  // Standing attack frames
+            frameHeight: 128
+        });
 
         console.log('Loading player and sword sprites...');
 
@@ -73,6 +77,14 @@ class BootScene extends Phaser.Scene {
         this.anims.create({
             key: 'run-attack-anim',
             frames: this.anims.generateFrameNumbers('run-to-attack', { start: 0, end: 7 }),
+            frameRate: 16,
+            repeat: 0 // Play once
+        });
+
+        // Create standing attack animation
+        this.anims.create({
+            key: 'stand-attack-anim',
+            frames: this.anims.generateFrameNumbers('attacking', { start: 0, end: 7 }),
             frameRate: 16,
             repeat: 0 // Play once
         });

@@ -153,9 +153,8 @@ class Player extends Phaser.GameObjects.Sprite {
                         this.isAttacking = false;
                     });
                 } else {
-                    // For standing attack, use last frame of idle (sword raised)
-                    // Or play the idle attack from the run-attack first frames
-                    this.play('run-attack-anim', true);
+                    // For standing attack, use attacking.png animation
+                    this.play('stand-attack-anim', true);
                     this.once('animationcomplete', () => {
                         this.isAttacking = false;
                     });
