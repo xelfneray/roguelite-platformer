@@ -227,16 +227,16 @@ class BaseEnemy extends Phaser.GameObjects.Rectangle {
             }
         });
 
-        // Drop coins (3x boost for mobile testing)
+        // Drop coins (reduced for difficulty)
         if (this.scene.upgradeManager) {
-            this.scene.upgradeManager.addCoins(15); // 3x boost
+            this.scene.upgradeManager.addCoins(5);
         }
 
         // Coin visual
         const coinText = this.scene.add.text(
             this.x,
             this.y,
-            '+15',
+            '+5',
             { fontSize: '18px', fill: '#ffd700', fontStyle: 'bold' }
         );
 

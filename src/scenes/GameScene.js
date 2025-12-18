@@ -83,13 +83,17 @@ class GameScene extends Phaser.Scene {
         this.physics.add.existing(ground, true);
         this.platforms.add(ground);
 
-        // Add some platforms for parkour
-        for (let x = 200; x < this.levelLength; x += 400) {
-            const height = Phaser.Utils.Array.GetRandom(GameConfig.level.platformHeight);
+        // RANDOMIZED platforms - different every time
+        const platformCount = Phaser.Math.Between(5, 10);
+        for (let i = 0; i < platformCount; i++) {
+            const x = Phaser.Math.Between(300, this.levelLength - 300);
+            const y = Phaser.Math.Between(350, 480);
+            const width = Phaser.Math.Between(80, 200);
+
             const platform = this.add.rectangle(
-                x + Phaser.Math.Between(-50, 50),
-                500 - height,
-                150,
+                x,
+                y,
+                width,
                 20,
                 GameConfig.colors.platform
             );
@@ -119,16 +123,13 @@ class GameScene extends Phaser.Scene {
     }
 
     spawnHealthPacks() {
-        // Spawn 5-8 health packs throughout the level
-        const packCount = Phaser.Math.Between(1, 3);
+        // Only 1 health pack per level
+        const packCount = 1;
 
         for (let i = 0; i < packCount; i++) {
             const x = Phaser.Math.Between(800, this.levelLength - 300);
             const y = 500;
-
-            // Create health pack visual (just rectangle, no text)
             const pack = this.add.rectangle(x, y, 25, 25, 0xff0066);
-
             this.physics.add.existing(pack, true);
             this.healthPacks.push(pack);
         }
@@ -392,9 +393,28 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        // Check level completion
+        // Check level completion - MUST KILL ALL ENEMIES FIRST
         if (this.physics.overlap(this.player, this.levelEnd)) {
-            this.completeLevel();
+            const remainingEnemies = this.enemyManager.enemies.filter(e => e.active).length;
+            if (remainingEnemies === 0) {
+                this.completeLevel();
+            } else {
+                if (!this.enemyWarningText) {
+                    this.enemyWarningText = this.add.text(
+                        this.cameras.main.worldView.centerX,
+                        100,
+                        `Kill all enemies first! (${remainingEnemies} remaining)`,
+                        { fontSize: '20px', fill: '#ff4444', fontStyle: 'bold' }
+                    ).setOrigin(0.5).setScrollFactor(0).setDepth(100);
+
+                    this.time.delayedCall(2000, () => {
+                        if (this.enemyWarningText) {
+                            this.enemyWarningText.destroy();
+                            this.enemyWarningText = null;
+                        }
+                    });
+                }
+            }
         }
 
         // Check health pack pickup

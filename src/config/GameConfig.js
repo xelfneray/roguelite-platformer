@@ -38,9 +38,9 @@ const GameConfig = {
     enemies: {
         archer: {
             name: 'Archer',
-            health: 15,
-            damage: 2,
-            speed: 80,
+            health: 40,
+            damage: 15,
+            speed: 100,
             attackRange: 200,
             preferredDistance: 180,
             color: 0x8B4513,
@@ -48,9 +48,9 @@ const GameConfig = {
         },
         turtle: {
             name: 'Turtle',
-            health: 30,
-            damage: 4,
-            speed: 40,
+            health: 80,
+            damage: 25,
+            speed: 50,
             attackRange: 60,
             preferredDistance: 100,
             color: 0x2F4F2F,
@@ -58,9 +58,9 @@ const GameConfig = {
         },
         speedZombie: {
             name: 'Speed Zombie',
-            health: 12,
-            damage: 3,
-            speed: 120, // Reduced from 150 to make it catchable
+            health: 30,
+            damage: 20,
+            speed: 140,
             attackRange: 40,
             preferredDistance: 0,
             color: 0x800080,
@@ -68,9 +68,9 @@ const GameConfig = {
         },
         giantRabbit: {
             name: 'Giant Rabbit',
-            health: 20,
-            damage: 5,
-            speed: 120,
+            health: 50,
+            damage: 30,
+            speed: 130,
             attackRange: 50,
             preferredDistance: 80,
             color: 0xFFB6C1,
