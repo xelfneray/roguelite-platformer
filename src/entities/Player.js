@@ -185,17 +185,20 @@ class Player extends Phaser.GameObjects.Sprite {
         const attackY = this.y;
         this.weaponManager.attack(attackX, attackY);
 
-        // Check joystick/keyboard DIRECTLY for most reliable detection
+        // Check joystick DIRECTLY using joystickActive and joystickX
         const tc = this.touchControls;
-        const hasTouch = tc && tc.isEnabled;
-        const leftPressed = this.cursors.left.isDown || (hasTouch && tc.isDown('left'));
-        const rightPressed = this.cursors.right.isDown || (hasTouch && tc.isDown('right'));
+        let isJoystickPushed = false;
 
-        // Check ALL conditions: animation key, joystick pressed, velocity, or saved input
-        const isRunning = (this.anims.currentAnim && this.anims.currentAnim.key === 'player-run-anim') ||
-            leftPressed || rightPressed ||
-            Math.abs(this.body.velocity.x) > 20 ||
-            this.isMovingInput;
+        if (tc && tc.isEnabled && tc.joystickActive) {
+            // Joystick is active AND being pushed left or right (threshold 0.3)
+            isJoystickPushed = Math.abs(tc.joystickX) > 0.3;
+        }
+
+        // Also check keyboard
+        const keyboardMoving = this.cursors.left.isDown || this.cursors.right.isDown;
+
+        // Check ALL conditions: joystick pushed, keyboard, velocity
+        const isRunning = isJoystickPushed || keyboardMoving || Math.abs(this.body.velocity.x) > 20;
 
         if (isRunning) {
             this.play('run-attack-anim');
