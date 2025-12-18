@@ -185,8 +185,13 @@ class Player extends Phaser.GameObjects.Sprite {
         const attackY = this.y;
         this.weaponManager.attack(attackX, attackY);
 
-        // Choose animation based on movement INPUT (not velocity)
-        if (this.isMovingInput) {
+        // Choose animation based on CURRENT ANIMATION or velocity
+        // If player is in run animation OR has any velocity, use run-attack
+        const isRunning = (this.anims.currentAnim && this.anims.currentAnim.key === 'player-run-anim') ||
+            Math.abs(this.body.velocity.x) > 5 ||
+            this.isMovingInput;
+
+        if (isRunning) {
             this.play('run-attack-anim');
         } else {
             this.play('stand-attack-anim');
